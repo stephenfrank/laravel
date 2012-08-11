@@ -174,4 +174,54 @@ class RequestTest extends PHPUnit_Framework_TestCase {
 		$this->assertEquals('Taylor', Request::route());
 	}
 
+	/**
+	 * Test the Request::set_header method.
+	 *
+	 * @group laravel
+	 */
+	public function testSetHeader()
+	{
+		Request::set_header('accept', 'application/json');
+		Request::set_header('content-type', 'application/json');
+		$headers = Request::headers();
+
+		$this->assertEquals('application/json', $headers['accept'][0]);
+		$this->assertEquals('application/json', $headers['content-type'][0]);
+	}
+
+	/**
+	 * Test the Request::accept method.
+	 *
+	 * @group laravel
+	 */
+	public function testRequestAccept()
+	{
+		Request::set_header('accept', 'application/json');
+		$accept = Request::accept();
+
+		$this->assertEquals('application/json', $accept[0]);
+
+		Request::set_header('accept', 'text/plain');
+		$accept = Request::accept();
+
+		$this->assertEquals('text/plain', $accept[0]);
+	}
+
+	/**
+	 * Test the Request::format method.
+	 *
+	 * @group laravel
+	 */
+	public function testRequestFormat()
+	{
+		Request::set_header('accept', 'application/json');
+
+		$this->assertEquals('json', Request::format());
+
+		Request::set_header('accept', 'text/plain');
+		$headers = Request::headers();
+
+		$this->assertEquals('txt', Request::format());
+	}
+
 }

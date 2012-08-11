@@ -63,6 +63,19 @@ class Request {
 	}
 
 	/**
+	 * Set a header value
+	 *
+	 * @param  string   $key eg. 'Content-type'
+	 * @param  mixed   $value Array or string of desired values
+	 * @param  bool   $replace Replace or merge the header values
+	 * @return void
+	 */
+	public static function set_header($key, $value, $replace = true)
+	{
+		static::foundation()->headers->set($key, $value, $replace);
+	}
+
+	/**
 	 * Get all of the HTTP request headers.
 	 *
 	 * @return array
@@ -113,7 +126,9 @@ class Request {
 	 */
 	public static function accept()
 	{
-		return static::foundation()->getAcceptableContentTypes();
+		$accept_headers = static::foundation()->headers->get('Accept');
+		
+		return array_keys(static::foundation()->splitHttpAcceptHeader($accept_headers));
 	}
 
 	/**
@@ -126,6 +141,35 @@ class Request {
 	{
 		return in_array($type, static::accept());
 	}
+
+
+
+	/**
+	 * Associates a format with mime types.
+	 *
+	 * @param string       $format     The format
+	 * @param string|array $mimeTypes  The associated mime types (the preferred one must be the first as it will be used as the content type)
+	 *
+	 */
+	public function set_format_mime($format, $mime_types)
+	{
+		static::foundation()->setFormat($format, $mime_types);
+	}
+
+	/**
+	 * Determine the request format based on Accept headers
+	 *
+	 * @param  mixed   $default
+	 * @return string  html|json|...
+	 */
+	public static function format($default = 'html')
+	{
+		$acceptable = static::accept();
+		$format = static::foundation()->getFormat(head($acceptable));
+		return $format ? $format : $default;
+	}
+
+
 
 	/**
 	 * Get the languages accepted by the client's browser.

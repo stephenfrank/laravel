@@ -119,4 +119,57 @@ abstract class Relationship extends Query {
 		return array_unique($keys);
 	}
 
+
+	public function ensure_related($models, $attributes = array())
+	{
+
+		$relationship_type = \class_basename(get_class($this));
+
+		if ($relationship_type === 'Has_Many')
+		{
+			if( ! is_array($models) ) $models = array($models);
+
+			foreach($models as $model)
+			{
+				$attributes[$this->foreign_key()] = $this->base->get_key();
+
+				$table = $this->table();
+
+				$table = $table->where($model->key(), '=', $model->id);
+
+				$table->update($attributes);
+			}
+		}
+		elseif ($relationship_type === 'Has_Many_And_Belongs_To')
+		{
+			if( ! is_array($models) ) $models = array($models);
+
+			foreach($models as $model)
+			{
+				$existing = $this->pivot()->where_in($this->other_key(), array($model->id))->get();
+				
+				if( empty($existing) )
+				{
+					$this->attach($model->get_key(), $attributes);
+				}
+			}
+		}
+		elseif ($relationship_type === 'Has_One')
+		{
+			$attributes[$this->foreign_key()] = $this->base->get_key();
+			$this->update($attributes);
+		}
+		elseif ($relationship_type === 'Belongs_To')
+		{
+			$attributes[ $this->foreign_key() ] = $models->get_key();
+
+			$this->base->update($this->base->get_key(), $attributes);
+			// $this->base->update()
+		}
+		else
+		{
+			exit('Relationship?');
+		}
+	}
+
 }

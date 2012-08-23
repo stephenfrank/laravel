@@ -207,7 +207,7 @@ class MySQL extends Grammar {
 	{
 		$keys = $this->columnize($command->columns);
 
-		$name = $command->name;
+		$name = substr($command->name, 0, 63);
 
 		return 'ALTER TABLE '.$this->wrap($table)." ADD {$type} {$name}({$keys})";
 	}
@@ -233,7 +233,7 @@ class MySQL extends Grammar {
 	 */
 	public function drop(Table $table, Fluent $command)
 	{
-		return 'DROP TABLE '.$this->wrap($table);
+		return 'DROP TABLE IF EXISTS '.$this->wrap($table);
 	}
 
 	/**

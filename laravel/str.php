@@ -102,6 +102,20 @@ class Str {
 		return ucwords(strtolower($value));
 	}
 
+	public static function humanize($value)
+	{
+		$value = preg_replace('/[_]+/', ' ', strtolower(trim($value)));
+
+		if (MB_STRING)
+		{
+			return mb_convert_case($value, MB_CASE_TITLE, static::encoding());
+		}
+
+		return ucwords(strtolower($value));
+	}
+
+
+
 	/**
 	 * Limit the number of characters in a string.
 	 *
@@ -346,5 +360,6 @@ class Str {
 				throw new \Exception("Invalid random string type [$type].");
 		}
 	}
+
 
 }
